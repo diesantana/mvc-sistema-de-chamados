@@ -44,6 +44,22 @@ Static Function ModelDef()
 	Local oStPaiZ2   := FWFormStruct(1, 'SZ2') // SZ2 - Cabeçalho do chamado
 	Local oStFilhoZ3 := FWFormStruct(1, 'SZ3') // SZ3 -Comentários do chamado
 
+	// Inc. Padrão para o Z3_CODCHAM
+	// O campo Z3_CODCHAM (Cód do chamado na tabela filho) vai ser preenchido com o valor 'SZ2->Z2_COD' (Cód. chamado da tabela pai)
+	oStFilhoZ3:SetProperty( 'Z3_CODCHAM', MODEL_FIELD_INIT, FWBuildFeature( STRUCT_FEATURE_INIPAD, "FwFldGet('Z2_COD')" ))
+	// Bloqueia a edição do campo Z3_CODCHAM
+	oStFilhoZ3:SetProperty('Z3_CODCHAM', MODEL_FIELD_WHEN, FWBuildFeature(STRUCT_FEATURE_WHEN, ".F."))
+
+	// Inc. Padrão para o Z3_AUTOR (Recebe o nome do usuário logado)
+	oStFilhoZ3:SetProperty( 'Z3_AUTOR', MODEL_FIELD_INIT, FWBuildFeature( STRUCT_FEATURE_INIPAD, "UsrRetName(RetCodUsr())" ))
+	// Bloqueia a edição do campo Z3_AUTOR
+	oStFilhoZ3:SetProperty('Z3_AUTOR', MODEL_FIELD_WHEN, FWBuildFeature(STRUCT_FEATURE_WHEN, ".F."))
+
+	// Inc. Padrão para o campo Data do Comentário Z3_DATA
+	oStFilhoZ3:SetProperty( 'Z3_DATA', MODEL_FIELD_INIT, FWBuildFeature( STRUCT_FEATURE_INIPAD, "Date()" ))
+	// Bloqueia a edição do campo Z3_DATA
+	oStFilhoZ3:SetProperty('Z3_DATA', MODEL_FIELD_WHEN, FWBuildFeature(STRUCT_FEATURE_WHEN, ".F."))
+
 	// Adiciona os componentes de Cabeçalho e Grid
 	oModel:AddFields('SZ2MASTER', /*cOwner*/, oStPaiZ2)
 	oModel:AddGrid('SZ3DETAIL', 'SZ2MASTER', oStFilhoZ3)
@@ -83,6 +99,9 @@ Static Function ViewDef()
 	Local oStPaiZ2   := FWFormStruct(2, 'SZ2') // SZ2 - Cabeçalho do chamado
 	Local oStFilhoZ3 := FWFormStruct(2, 'SZ3') // SZ3 - Comentários do chamado
 
+	// Remove o campo da estrutura de dados, pois o seu valor é apresentado no Cabeçalho.
+	oStFilhoZ3:RemoveField('Z3_CODCHAM');
+
 	// Instancia a View e amarra o Modelo a ela
 	Local oView      := FWFormView():New()
 	oView:SetModel(oModel)
@@ -90,6 +109,9 @@ Static Function ViewDef()
 	// Adiciona o Cabeçalho e o Grid (itens) a view.
 	oView:AddField('VIEW_SZ2', oStPaiZ2, 'SZ2MASTER')
 	oView:AddGrid('VIEW_SZ3', oStFilhoZ3, 'SZ3DETAIL')
+
+	// Código incremental
+	oView:AddIncrementField('VIEW_SZ3', 'Z3_CODIGO')
 
 	// 5. Divide a tela: 60% para o cabeçalho e 40% para os itens
 	oView:CreateHorizontalBox('CABECALHO', 70)
@@ -132,9 +154,9 @@ Exibe os detalhes das legendas.
 User Function XLEGEND()
 	Local aLegenda := {}
 
-	AADD(aLegenda, {"BR_RED", 	"Chamado Aberto"})
-	AADD(aLegenda, {"BR_BLUE", 	"Chamado em Andamento"})
-	AADD(aLegenda, {"BR_GREEN", "Chamado Finalizado"})
+	AADD(aLegenda, {"BR_VERMELHO", 	"Chamado Aberto"})
+	AADD(aLegenda, {"BR_AZUL", 	"Chamado em Andamento"})
+	AADD(aLegenda, {"BR_VERDE", "Chamado Finalizado"})
 
 	// BrwLegenda("Título", "Sub Título", aLegenda)
 	BrwLegenda("Status do Chamado",, aLegenda)
