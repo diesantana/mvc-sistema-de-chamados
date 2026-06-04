@@ -52,6 +52,9 @@ Static Function ModelDef()
 	// Lógica para bloquear ou não o campo Cód. do Usuário
 	oStPaiZ2:SetProperty('Z2_USUARIO', MODEL_FIELD_WHEN, FWBuildFeature(STRUCT_FEATURE_WHEN, 'U_BlockCp()'))
 
+	// Bloqueia o campo Nome do Usuário para edição
+	oStPaiZ2:SetProperty('Z2_USERNAM', MODEL_FIELD_WHEN, FWBuildFeature(STRUCT_FEATURE_WHEN, '.F.'))
+
 	// Inc. Padrão para o Z3_CODCHAM
 	// O campo Z3_CODCHAM (Cód do chamado na tabela filho) vai ser preenchido com o valor 'SZ2->Z2_COD' (Cód. chamado da tabela pai)
 	oStFilhoZ3:SetProperty( 'Z3_CODCHAM', MODEL_FIELD_INIT, FWBuildFeature( STRUCT_FEATURE_INIPAD, "FwFldGet('Z2_COD')" ))
