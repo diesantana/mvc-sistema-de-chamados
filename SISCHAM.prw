@@ -60,6 +60,9 @@ Static Function ModelDef()
 	// Bloqueia a edição do campo Z3_DATA
 	oStFilhoZ3:SetProperty('Z3_DATA', MODEL_FIELD_WHEN, FWBuildFeature(STRUCT_FEATURE_WHEN, ".F."))
 
+	// Bloqueia a edição do Código do Comentário
+	oStFilhoZ3:SetProperty('Z3_CODIGO', MODEL_FIELD_WHEN, FWBuildFeature(STRUCT_FEATURE_WHEN, ".F."))
+
 	// Adiciona os componentes de Cabeçalho e Grid
 	oModel:AddFields('SZ2MASTER', /*cOwner*/, oStPaiZ2)
 	oModel:AddGrid('SZ3DETAIL', 'SZ2MASTER', oStFilhoZ3)
@@ -73,7 +76,6 @@ Static Function ModelDef()
 	// Define a chave primária da entidade principal (Cabeçalho)
 	oModel:SetPrimaryKey({'Z2_FILIAL', 'Z2_COD'})
 	// Bloqueia a repetição do código do item na mesma tela
-	// Impede linhas duplicadas com os valores: CÓDIGO DO CHAMADO + CÓDIGO DO COMENTÁRIO
 	oModel:GetModel('SZ3DETAIL'):SetUniqueLine({'Z3_CODCHAM','Z3_CODIGO'})
 
 	// Define as descrições dos componentes
@@ -110,14 +112,14 @@ Static Function ViewDef()
 	oView:AddField('VIEW_SZ2', oStPaiZ2, 'SZ2MASTER')
 	oView:AddGrid('VIEW_SZ3', oStFilhoZ3, 'SZ3DETAIL')
 
-	// Código incremental
+	// Código do Comentário incremental
 	oView:AddIncrementField('VIEW_SZ3', 'Z3_CODIGO')
 
-	// 5. Divide a tela: 60% para o cabeçalho e 40% para os itens
+	// Divide a tela: 60% para o cabeçalho e 40% para os itens
 	oView:CreateHorizontalBox('CABECALHO', 70)
 	oView:CreateHorizontalBox('ITENS', 30)
 
-	// 6. Amarra os componentes visuais dentro de cada divisão da tela
+	// Amarra os componentes visuais dentro de cada divisão da tela
 	oView:SetOwnerView('VIEW_SZ2', 'CABECALHO')
 	oView:SetOwnerView('VIEW_SZ3', 'ITENS')
 
