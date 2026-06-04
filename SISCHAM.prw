@@ -76,7 +76,8 @@ Static Function ModelDef()
 
 	// Adiciona os componentes de Cabeçalho e Grid
 	oModel:AddFields('SZ2MASTER', /*cOwner*/, oStPaiZ2)
-	oModel:AddGrid('SZ3DETAIL', 'SZ2MASTER', oStFilhoZ3)
+	// VldPre é a função que executa a pré validação
+	oModel:AddGrid('SZ3DETAIL', 'SZ2MASTER', oStFilhoZ3, { |oModelGrid, nLine, cAction, cField| VldPre(oModelGrid, nLine, cAction, cField) })
 
 	// Cria o relacionamento entre Filho (SZ3) e Pai (SZ2)
 	// Z3_COD 		= Código dos comentários
@@ -199,3 +200,28 @@ User Function BlockCp()
 		lLibera := .F.
 	EndIf
 Return lLibera
+
+/*/{Protheus.doc} vldPre
+	Função de Pré-validação.
+	Impede a exclusão de comentários do chamado.
+	@type  Function
+	@author Diego Santana
+	@since 04/06/2026
+	@param oModelGrid, Object, O objeto que representa o Grid.
+	@param nLine, Numeric, O número da linha que está sendo manipulada.
+	@param cAction, character, A ação tentada ('SETVALUE' ou 'DELETE'). 
+	SETVALUE ocorre quando o usuário tenta alterar ou inserir uma linha no GRID.
+	@param cField, character, O campo afetado (só é preenchido se a ação for 'SETVALUE').
+	@return Logical, Se retornar .T. a ação ocorre normalmente
+/*/
+Static Function VldPre(oModelGrid, nLine, cAction, cField)
+	Local lRet := .T.
+	// Número da operação (3=Incluir, 4=Alterar)
+	Local nOper := oModelGrid:GetModel():GetOperation()
+
+	// Ao Atualizar um registro (nOper == 4) se o usuário tentar apagar uma linha ('DELETE')
+	If cAction == 'DELETE' .AND. nOper == 4
+		Help(,, 'Pré-Validação',, 'Não é permitido apagar os comentários de um chamado!', 1, 0)
+		lRet := .F. // Bloqueia a exclusão da linha
+	EndIf
+Return lRet // Se retornar .T., a ação ocorre normalmente
