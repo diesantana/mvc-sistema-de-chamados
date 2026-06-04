@@ -43,6 +43,10 @@ Static Function ModelDef()
 	// Cria as estruturas baseadas no Dicionário
 	Local oStPaiZ2   := FWFormStruct(1, 'SZ2') // SZ2 - Cabeçalho do chamado
 	Local oStFilhoZ3 := FWFormStruct(1, 'SZ3') // SZ3 -Comentários do chamado
+	Local aTrigger := {}
+
+	aTrigger := FwStruTrigger("Z2_USUARIO", "Z2_USERNAM","USRRETNAME(M->Z2_USUARIO)",.F.)
+	oStPaiZ2:AddTrigger(aTrigger[1],aTrigger[2],aTrigger[3],aTrigger[4])
 
 	// Inc. Padrão para o Z3_CODCHAM
 	// O campo Z3_CODCHAM (Cód do chamado na tabela filho) vai ser preenchido com o valor 'SZ2->Z2_COD' (Cód. chamado da tabela pai)
