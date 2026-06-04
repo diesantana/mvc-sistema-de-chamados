@@ -45,8 +45,12 @@ Static Function ModelDef()
 	Local oStFilhoZ3 := FWFormStruct(1, 'SZ3') // SZ3 -Comentários do chamado
 	Local aTrigger := {}
 
+	// Gatilho para carregar o nome do usuário
 	aTrigger := FwStruTrigger("Z2_USUARIO", "Z2_USERNAM","USRRETNAME(M->Z2_USUARIO)",.F.)
 	oStPaiZ2:AddTrigger(aTrigger[1],aTrigger[2],aTrigger[3],aTrigger[4])
+
+	// Lógica para bloquear ou não o campo Cód. do Usuário
+	oStPaiZ2:SetProperty('Z2_USUARIO', MODEL_FIELD_WHEN, FWBuildFeature(STRUCT_FEATURE_WHEN, 'U_BlockCp()'))
 
 	// Inc. Padrão para o Z3_CODCHAM
 	// O campo Z3_CODCHAM (Cód do chamado na tabela filho) vai ser preenchido com o valor 'SZ2->Z2_COD' (Cód. chamado da tabela pai)
@@ -170,3 +174,25 @@ User Function XLEGEND()
 	BrwLegenda("Status do Chamado",, aLegenda)
 Return aLegenda
 
+/*/{Protheus.doc} BlockCp
+Valida se o campo poderá ser editado com base nos códigos cadastrados no parâmetro MV_SZ2USER.
+@type function
+@author Diego
+@since 04/06/2026
+@return Logical, Valor lógico, indicando se o campo será liberado ou não.
+/*/
+User Function BlockCp()
+	Local lLibera := .T. // Variável de controle
+
+	// Conteúdo do parâmetro com usuários autorizados
+	// MV_SZ2USER é o parâmetro customziado que armazena os users com super permissões na gestão de chamados
+	Local cUsersAuth := SUPERGETMV("MV_SZ2USER")
+	// Pega o código do usuário logado
+	Local cUserAtual := RetCodUsr()
+
+	// Se o usuário atual NÃO estiver na lista de autorizados
+	If !(cUserAtual $ cUsersAuth)
+		// Bloqueia a edição do campo código e nome de usuário
+		lLibera := .F.
+	EndIf
+Return lLibera
