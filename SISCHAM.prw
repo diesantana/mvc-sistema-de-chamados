@@ -104,13 +104,15 @@ Static Function ViewDef()
 	// Cria as estruturas visuais baseadas no Dicionário (parâmetro 2 = View)
 	Local oStPaiZ2   := FWFormStruct(2, 'SZ2') // SZ2 - Cabeçalho do chamado
 	Local oStFilhoZ3 := FWFormStruct(2, 'SZ3') // SZ3 - Comentários do chamado
+	// Instancia a View e amarra o Modelo a ela
+	Local oView      := FWFormView():New()
+	oView:SetModel(oModel)
 
 	// Remove o campo da estrutura de dados, pois o seu valor é apresentado no Cabeçalho.
 	oStFilhoZ3:RemoveField('Z3_CODCHAM');
 
-	// Instancia a View e amarra o Modelo a ela
-	Local oView      := FWFormView():New()
-	oView:SetModel(oModel)
+	// Atribui a consulta padrão "USR" (Usuários) ao campo Z2_USUARIO
+	oStPaiZ2:SetProperty('Z2_USUARIO', MVC_VIEW_LOOKUP, 'USR')
 
 	// Adiciona o Cabeçalho e o Grid (itens) a view.
 	oView:AddField('VIEW_SZ2', oStPaiZ2, 'SZ2MASTER')
