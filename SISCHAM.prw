@@ -38,7 +38,8 @@ Define a estrutuera de dados
 /*/
 Static Function ModelDef()
 	// Instancia o modelo
-	Local oModel     := MPFormModel():New('SISCHAMM')
+	// O segundo parâmetro é a Pós validação
+	Local oModel     := MPFormModel():New('SISCHAMM',,{|oModel| VldPos(oModel)})
 
 	// Cria as estruturas baseadas no Dicionário
 	Local oStPaiZ2   := FWFormStruct(1, 'SZ2') // SZ2 - Cabeçalho do chamado
@@ -225,3 +226,27 @@ Static Function VldPre(oModelGrid, nLine, cAction, cField)
 		lRet := .F. // Bloqueia a exclusão da linha
 	EndIf
 Return lRet // Se retornar .T., a ação ocorre normalmente
+
+/*/{Protheus.doc} VldPos
+	Validação aplicada ao Confirmar o formulário de cadastro ou atualização.
+	@type  Static Function
+	@author Diego Santana
+	@since 05/06/2026
+	@param oModel, object, Modelo de dados em que a validação será aplicada.
+	@return Logical, Se .T. a operação será permitida.
+/*/
+Static Function VldPos(oModel)
+	Local lRet := .T.
+	// Pega o valor do campo Z2_DESC (Descrição do Chamado)
+	Local cDesc := oModel:GetValue("SZ2MASTER", "Z2_DESC")
+	// Pega a quantidade de caracteres digitada no campo, removendo espaços em branco
+	Local nLen := Len(AllTrim(cDesc))
+
+	// Verifica se a quantidade digitada é maior que 15 caracteres
+	If nLen < 15
+		// Exbibe uma mensagem de erro
+		ExibeHelp("Help", "A Descrição deve ser mais detalhada.", "O campo descrição não pode ser menor que 15 caracteres.")
+		lRet := .F. // Bloqueia a operação (Seja de cadastro ou atualização)
+	EndIF
+
+Return lRet
